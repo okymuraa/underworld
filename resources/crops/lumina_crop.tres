@@ -17,4 +17,3 @@ max_harvest_count = 2
 seed_item = ExtResource("3_seed")
 extra_seed_chance = 0.5
 is_perennial_wild = false
-wild_regrow_time = 15.0

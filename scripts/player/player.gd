@@ -1,10 +1,9 @@
 extends CharacterBody2D
 
+signal died
+
 ## Velocidad de movimiento del personaje en píxeles por segundo
 @export var speed: float = 150.0
-
-## Alcance para usar herramientas / golpear recursos (en píxeles)
-@export var tool_reach: float = 75.0
 
 ## Nombres de tus animaciones en el AnimatedSprite2D
 @export var anim_down: String = "walk"
@@ -12,6 +11,8 @@ extends CharacterBody2D
 @export var anim_side: String = "walk_side"
 
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
+## Alcance de las herramientas: edita el CollisionShape2D de "ToolRange" en player.tscn
+@onready var tool_range: Area2D = $ToolRange
 
 var _last_facing_dir: Vector2 = Vector2.DOWN
 var _is_acting: bool = false
@@ -68,9 +69,11 @@ func _play_anim(anim_name: String, flip: bool) -> void:
 
 ## Acción de usar la herramienta equipada hacia la posición del ratón
 func _use_equipped_tool() -> void:
+	# Esperar a que termine el golpe anterior (evita golpear sin animación al spamear clic)
+	if _is_acting:
+		return
 	var mouse_pos = get_global_mouse_position()
 	var to_mouse = mouse_pos - global_position
-	var dist = to_mouse.length()
 
 	# Obtener item actualmente seleccionado en el inventario
 	var tool_type = "none"
@@ -88,38 +91,21 @@ func _use_equipped_tool() -> void:
 	# Efecto visual de golpe / acción (inclinación sutil)
 	_animate_tool_swing(to_mouse.normalized(), tool_color)
 
-	# Buscar Harvestable en el punto de clic o en dirección hacia el ratón dentro del alcance
-	var target_harvestable = _find_target_harvestable(mouse_pos, dist)
+	# Buscar Harvestable dentro del área de alcance, priorizando el más cercano al cursor
+	var target_harvestable = _find_target_harvestable(mouse_pos)
 	if target_harvestable:
 		target_harvestable.hit(tool_type, tool_power)
 
-func _find_target_harvestable(target_pos: Vector2, dist: float) -> Harvestable:
-	# Comprobar si está dentro de la distancia máxima
-	if dist > tool_reach:
-		return null
-
-	# Usar consulta de espacio físico 2D en el punto del cursor
-	var space_state = get_world_2d().direct_space_state
-	var query = PhysicsPointQueryParameters2D.new()
-	query.position = target_pos
-	query.collide_with_areas = true
-	query.collide_with_bodies = false
-
-	var results = space_state.intersect_point(query, 8)
-	for res in results:
-		var collider = res.collider
-		if collider is Harvestable:
-			return collider
-
-	# Si no hizo clic exacto sobre el área, buscar el harvestable más cercano dentro del alcance
+func _find_target_harvestable(target_pos: Vector2) -> Harvestable:
+	# Solo cuentan los recursos cuya área toca el ToolRange del jugador
 	var nearest: Harvestable = null
-	var min_d = 99999.0
-	for node in get_tree().get_nodes_in_group("harvestables"):
-		if node is Harvestable:
-			var d = global_position.distance_to(node.global_position)
-			if d <= tool_reach and d < min_d:
+	var min_d = INF
+	for area in tool_range.get_overlapping_areas():
+		if area is Harvestable and not area.is_depleted:
+			var d = target_pos.distance_to(area.global_position)
+			if d < min_d:
 				min_d = d
-				nearest = node
+				nearest = area
 
 	return nearest
 
@@ -162,17 +148,38 @@ func _spawn_swing_effect(spawn_pos: Vector2, angle: float, col: Color) -> void:
 	tw.tween_callback(effect.queue_free)
 
 func _try_interact() -> void:
-	# Buscar interactables cercanos
+	# Buscar el interactable más cercano cuyo área nos tenga dentro (el que muestra "[E] ...")
 	var nearest: Interactable = null
 	var min_dist: float = 99999.0
 
 	var areas = get_tree().get_nodes_in_group("interactables")
 	for node in areas:
-		if node is Interactable and node.is_active:
+		if node is Interactable and node.is_active and node.player_in_range == self:
 			var d = global_position.distance_to(node.global_position)
-			if d <= tool_reach and d < min_dist:
+			if d < min_dist:
 				min_dist = d
 				nearest = node
 
 	if nearest:
 		nearest.interact(self)
+
+## Resta vida al jugador (la vida vive en Global para conservarse entre escenas)
+func take_damage(amount: int) -> void:
+	if amount <= 0 or Global.player_health <= 0:
+		return
+	Global.player_health -= amount
+	_flash_damage()
+	if Global.player_health <= 0:
+		died.emit()
+
+func heal(amount: int) -> void:
+	if amount <= 0:
+		return
+	Global.player_health += amount
+
+func _flash_damage() -> void:
+	if not animated_sprite:
+		return
+	var tw = create_tween()
+	animated_sprite.modulate = Color(1.0, 0.35, 0.35)
+	tw.tween_property(animated_sprite, "modulate", Color.WHITE, 0.25)

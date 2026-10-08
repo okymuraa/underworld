@@ -1,12 +1,14 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
 [ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1_item"]
+[ext_resource type="Texture2D" path="res://art/itemsUpdate/semilla.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_item")
 id = "lumina_seed"
 name = "Semilla Lumina"
 description = "Semilla de una flor fosforescente de las cavernas. Plántala en una caja de cultivo."
+icon = ExtResource("2_icon")
 placeholder_color = Color(0.3, 0.9, 0.5, 1)
 placeholder_symbol = "🌱"
 max_stack = 99

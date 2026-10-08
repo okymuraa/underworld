@@ -8,13 +8,15 @@ extends Area2D
 
 var _target_player: Node2D = null
 var _collecting: bool = false
-var _initial_y: float = 0.0
 var _time_passed: float = 0.0
+# Desplazamiento vertical de la flotación (solo visual, no mueve el nodo)
+var _bob_offset: float = 0.0
 
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 
-static func spawn(parent: Node, spawn_pos: Vector2, item: ItemData, count: int = 1) -> Pickup:
+## scatter = false lo deja exactamente en spawn_pos (al restaurar objetos guardados)
+static func spawn(parent: Node, spawn_pos: Vector2, item: ItemData, count: int = 1, scatter: bool = true) -> Pickup:
 	var scene = load("res://scenes/objects/pickups/pickup.tscn") as PackedScene
 	if not scene:
 		return null
@@ -23,6 +25,8 @@ static func spawn(parent: Node, spawn_pos: Vector2, item: ItemData, count: int =
 	inst.amount = count
 	inst.global_position = spawn_pos
 	parent.add_child(inst)
+	if not scatter:
+		return inst
 	# Pequeño impulso inicial aleatorio para que se disperse al caer
 	var spread = Vector2(randf_range(-16, 16), randf_range(-12, 12))
 	var tween = inst.create_tween()
@@ -30,7 +34,7 @@ static func spawn(parent: Node, spawn_pos: Vector2, item: ItemData, count: int =
 	return inst
 
 func _ready() -> void:
-	_initial_y = position.y
+	add_to_group("pickups") # WorldState los guarda al cambiar de escena
 	_update_visuals()
 	body_entered.connect(_on_body_entered)
 	queue_redraw()
@@ -46,11 +50,14 @@ func _update_visuals() -> void:
 		queue_redraw()
 
 func _draw() -> void:
+	if not item_data:
+		return
+	# Pequeña sombra en el suelo (no flota)
+	draw_circle(Vector2(0, 8), 6, Color(0, 0, 0, 0.3))
 	# Figura geométrica representativa si aún no hay arte asignado
-	if item_data and (not item_data.icon):
+	if not item_data.icon:
 		var col = item_data.placeholder_color
-		# Pequeña sombra en el suelo
-		draw_circle(Vector2(0, 8), 6, Color(0, 0, 0, 0.3))
+		draw_set_transform(Vector2(0, _bob_offset))
 		# Rombo representativo del recurso/item
 		var points = PackedVector2Array([
 			Vector2(0, -7),
@@ -75,7 +82,11 @@ func _process(delta: float) -> void:
 	else:
 		# Flotación suave idle
 		_time_passed += delta * 4.0
-		position.y = _initial_y + sin(_time_passed) * 2.5
+		_bob_offset = sin(_time_passed) * 2.5
+		if sprite and sprite.visible:
+			sprite.position.y = _bob_offset
+		else:
+			queue_redraw()
 
 func _on_body_entered(body: Node2D) -> void:
 	if _collecting:
@@ -85,7 +96,7 @@ func _on_body_entered(body: Node2D) -> void:
 		_collecting = true
 
 func _collect() -> void:
-	if item_data and Engine.has_singleton("InventoryManager") or get_node_or_null("/root/InventoryManager"):
+	if item_data and get_node_or_null("/root/InventoryManager"):
 		var mgr = get_node("/root/InventoryManager")
 		var remainder = mgr.add_item(item_data, amount)
 		if remainder == 0:

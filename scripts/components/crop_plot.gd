@@ -19,16 +19,25 @@ var _growth_timer: float = 0.0
 @onready var interactable: Interactable = $Interactable
 
 func _ready() -> void:
+	add_to_group("persist") # WorldState guarda su estado al cambiar de escena
 	if interactable:
 		interactable.interacted.connect(_on_interacted)
 	_update_state()
 
 func _process(delta: float) -> void:
-	if crop_data != null and not is_mature:
-		_growth_timer += delta
-		if _growth_timer >= crop_data.seconds_per_stage:
-			_growth_timer = 0.0
-			_advance_stage()
+	_simulate_growth(delta)
+
+## Avanza el crecimiento como si hubieran pasado 'seconds' segundos
+## (cada frame, o de golpe al volver a una escena)
+func _simulate_growth(seconds: float) -> void:
+	while crop_data != null and not is_mature and seconds > 0.0:
+		var needed = crop_data.seconds_per_stage - _growth_timer
+		if seconds < needed:
+			_growth_timer += seconds
+			return
+		seconds -= needed
+		_growth_timer = 0.0
+		_advance_stage()
 
 func _advance_stage() -> void:
 	current_stage += 1
@@ -144,8 +153,8 @@ func _harvest() -> void:
 
 	crop_harvested.emit()
 
-	# Si es silvestre perenne, vuelve a crecer; si es caja de cultivo, queda vacía
-	if crop_data.is_perennial_wild:
+	# Si es silvestre (o perenne), vuelve a crecer; si es caja de cultivo, queda vacía
+	if crop_data.is_perennial_wild or not is_planter_box:
 		is_mature = false
 		current_stage = 0
 		_growth_timer = 0.0
@@ -163,3 +172,22 @@ func _find_crop_for_seed(seed_item: ItemData) -> CropData:
 	if ResourceLoader.exists(test_path):
 		return load(test_path) as CropData
 	return null
+
+## --- Persistencia (usado por WorldState) ---
+func save_state() -> Dictionary:
+	return {
+		"crop": crop_data.resource_path if crop_data else "",
+		"stage": current_stage,
+		"mature": is_mature,
+		"growth_timer": _growth_timer,
+	}
+
+## 'elapsed' = segundos que pasaron fuera de la escena; la planta sigue creciendo en ese tiempo
+func load_state(data: Dictionary, elapsed: float) -> void:
+	var path: String = data.get("crop", "")
+	crop_data = load(path) as CropData if path != "" else null
+	current_stage = data.get("stage", 0)
+	is_mature = data.get("mature", false)
+	_growth_timer = data.get("growth_timer", 0.0)
+	_simulate_growth(elapsed)
+	_update_state()

@@ -11,7 +11,7 @@
 | `art/plants/` | Árboles, arbustos y plantas del entorno. |
 | `art/buildings/` | Casas, entradas de cueva y estructuras. |
 | `art/characters/` | Sprites del jugador y personajes. |
-| `art/items/` | *(Nueva)* Íconos pequeños para los materiales y herramientas (16x16 o 24x24). |
+| `art/itemsUpdate/` | Íconos de items 16×16 (más de 1.200: materiales, herramientas, armas, comida...). |
 | `art/_source/` | Tus archivos editables de Aseprite (`.ase`, `.aseprite`). |
 | `scenes/levels/` | Los mapas jugables (`main.tscn`, `casa_interior.tscn`). |
 | `scenes/objects/harvestables/` | Objetos talables/minables (`tree.tscn`, `rock.tscn`). |
@@ -24,9 +24,9 @@
 ## ✅ 2. Lo que YA está programado y funcionando
 
 1. **Movimiento e Interacción**:
-   - `WASD`: Moverte en 4 direcciones con animación.
-   - `E`: Entrar/salir de casas, interactuar con cultivos, etc.
-   - `Clic Izquierdo`: Golpear o usar la herramienta activa hacia el cursor.
+   - `WASD`: Moverte (8 direcciones) con animación.
+   - `E`: Interactuar con cultivos y objetos que muestran `[E]`. Las puertas se activan al pisarlas.
+   - `Clic Izquierdo`: Golpear con la herramienta activa. Solo alcanza lo que toca el área `ToolRange` del jugador (círculo editable en `player.tscn`); si hay varios, golpea el más cercano al cursor.
    - `Teclas 1 al 9` o `Rueda del Ratón`: Cambiar ranura de la barra rápida (Hotbar).
 2. **Sistema de Tala y Minería**:
    - Árboles con sacudida y caída de troncos de madera al golpearlos con Hacha.
@@ -36,9 +36,20 @@
    - Todo lo que cae al suelo flota con sombra y vuela automáticamente al jugador al pasar cerca.
 4. **Sistema de Cultivos (Doble Enfoque)**:
    - **Bancales / Cajas de Cultivo (`planter_box.tscn`)**: Te acercas con semillas, presionas `E`, ves germinar la planta por 3 fases y al madurar presionas `E` para cosecharla.
-   - **Plantas silvestres de caverna (`wild_crop.tscn`)**: Crecen solas en la tierra y vuelven a brotar tras cosecharlas.
+   - **Plantas silvestres de caverna (`wild_crop.tscn`)**: Crecen solas en la tierra y vuelven a brotar al instante tras cosecharlas.
+   - Los árboles y rocas tardan en reaparecer lo que diga su `respawn_time` (en el nodo `Harvestable` de `tree.tscn` = 20 s, `rock.tscn` = 25 s).
 5. **Transición sin bucles**:
    - Puertas con punto de aparición exacto (`spawn_position`).
+6. **El mundo se guarda al cambiar de escena** (`WorldState`):
+   - Al entrar y salir de la casa se conservan los cultivos plantados, los árboles/rocas talados o dañados y los objetos tirados en el suelo.
+   - El tiempo sigue corriendo mientras estás fuera: los cultivos crecen y los árboles reaparecen igual.
+   - Para que un objeto nuevo se guarde: añádelo al grupo `persist` y dale `save_state()` y `load_state(data, elapsed)`.
+   - Las puertas deben cambiar de escena con `WorldState.change_scene(ruta)`.
+   - ⚠️ Cada objeto se reconoce por su nombre en la escena: si renombras un nodo (ej: `Tree1`), pierde su estado guardado en esa partida.
+   - Aún no se guarda en disco: al cerrar el juego todo empieza de cero.
+7. **Vida del jugador**:
+   - Barra de vida arriba a la izquierda (`scenes/ui/health_bar.tscn`), cambia de color (verde → amarillo → rojo).
+   - La vida se guarda en `Global` y se conserva al cambiar de escena. Usa `player.take_damage(n)` y `player.heal(n)`; la señal `died` avisa al llegar a 0.
 
 ---
 
@@ -46,13 +57,14 @@
 
 Puedes ir haciendo estos dibujos a tu propio ritmo. Cada vez que termines uno, ponle una `[X]`:
 
-### A. Íconos de Inventario (Tamaño recomendado: 16×16 o 24×24 px)
-- [ ] **Madera** (`art/items/wood.png`): Un leño o tronco.
-- [ ] **Piedra** (`art/items/stone.png`): Un trozo de roca o mineral.
-- [ ] **Hacha** (`art/items/axe.png`): Hacha básica.
-- [ ] **Pico** (`art/items/pickaxe.png`): Pico de minero.
-- [ ] **Semilla Lumina** (`art/items/lumina_seed.png`): Pequeña semilla/espora brillante.
-- [ ] **Flor Lumina** (`art/items/lumina_flower.png`): Flor o fruto cosechado.
+### A. Íconos de Inventario (16×16 px, en `art/itemsUpdate/`)
+- [X] **Madera** → `tronco.png`
+- [X] **Piedra** → `piedra.png`
+- [X] **Hacha** → `hacha_cobre.png`
+- [X] **Pico** → `pico_simple.png`
+- [X] **Semilla Lumina** → `semilla.png`
+- [X] **Flor Lumina** → `flor_azul.png`
+- [X] **Corazón de la barra de vida** → `corazon.png`
 
 ### B. Elementos del Mundo
 - [ ] **Sprite de Roca** (`art/terrain/rock.png`): Dibujar la roca para reemplazar el polígono actual de `rock.tscn`.

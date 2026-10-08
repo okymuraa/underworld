@@ -5,11 +5,17 @@ extends Area2D
 
 signal interacted(player: Node2D)
 
-@export var prompt_message: String = "Interactuar"
+var _label: Label = null
+
+@export var prompt_message: String = "Interactuar":
+	set(value):
+		prompt_message = value
+		# Refrescar el texto aunque el jugador ya esté dentro del área
+		if _label:
+			_label.text = "[E] " + prompt_message
 @export var is_active: bool = true
 
 var player_in_range: Node2D = null
-var _label: Label = null
 
 func _ready() -> void:
 	# Configurar colisiones para interactuar

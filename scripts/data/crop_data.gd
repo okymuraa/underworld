@@ -25,5 +25,5 @@ extends Resource
 @export var extra_seed_chance: float = 0.5
 
 ## ¿Es una planta silvestre de caverna que vuelve a brotar sola?
+## (Las plantas fuera de un bancal siempre rebrotan al instante; esto lo fuerza también en bancales)
 @export var is_perennial_wild: bool = false
-@export var wild_regrow_time: float = 20.0

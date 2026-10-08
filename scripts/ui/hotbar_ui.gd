@@ -53,7 +53,8 @@ func _create_slots() -> void:
 
 		var icon_rect = TextureRect.new()
 		icon_rect.name = "Icon"
-		icon_rect.custom_minimum_size = Vector2(24, 24)
+		icon_rect.custom_minimum_size = Vector2(32, 32) # 2x los íconos de 16px
+		icon_rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST # pixel art nítido
 		icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		center.add_child(icon_rect)

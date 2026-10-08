@@ -108,10 +108,10 @@ position = Vector2(90, 210)
 [node name="Rock2" parent="plants" unique_id=1963974892 instance=ExtResource("11_rock_scene")]
 position = Vector2(140, 245)
 
-[node name="PlanterBox1" parent="plants" instance=ExtResource("12_planter_scene")]
+[node name="PlanterBox1" parent="plants" unique_id=79235262 instance=ExtResource("12_planter_scene")]
 position = Vector2(-20, 160)
 
-[node name="WildCrop1" parent="plants" instance=ExtResource("13_wild_crop_scene")]
+[node name="WildCrop1" parent="plants" unique_id=315221815 instance=ExtResource("13_wild_crop_scene")]
 position = Vector2(40, 220)
 
 [node name="plant_lamp" type="StaticBody2D" parent="plants" unique_id=1147993356]

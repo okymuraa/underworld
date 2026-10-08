@@ -1,11 +1,15 @@
 [gd_scene format=3 uid="uid://7302yt0xlce4"]
 
-[ext_resource type="Script" path="res://scripts/player/player.gd" id="1_player_script"]
-[ext_resource type="SpriteFrames" path="res://resources/sprite_frames/player.tres" id="2_onrkg"]
+[ext_resource type="Script" uid="uid://ca4pqnskimuv3" path="res://scripts/player/player.gd" id="1_player_script"]
+[ext_resource type="SpriteFrames" uid="uid://c1kgbfcivb56x" path="res://resources/sprite_frames/player.tres" id="2_onrkg"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hotbar.tscn" id="3_hotbar"]
+[ext_resource type="PackedScene" path="res://scenes/ui/health_bar.tscn" id="4_health"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_feet"]
 radius = 8.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_tool_range"]
+radius = 36.0
 
 [node name="Player" type="CharacterBody2D" unique_id=813801861]
 y_sort_enabled = true
@@ -23,7 +27,17 @@ shape = SubResource("CircleShape2D_feet")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1716612587]
 position = Vector2(0, -16)
-zoom = Vector2(2.0, 2.0)
+zoom = Vector2(2, 2)
 position_smoothing_enabled = true
 
-[node name="HotbarUI" parent="." instance=ExtResource("3_hotbar")]
+[node name="HotbarUI" parent="." unique_id=135275233 instance=ExtResource("3_hotbar")]
+
+[node name="HealthBarUI" parent="." unique_id=1511861073 instance=ExtResource("4_health")]
+
+[node name="ToolRange" type="Area2D" parent="." unique_id=571191500]
+position = Vector2(0, -8)
+collision_layer = 0
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ToolRange" unique_id=215838417]
+shape = SubResource("CircleShape2D_tool_range")

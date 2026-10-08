@@ -20,7 +20,7 @@ func _on_body_entered(body: Node2D) -> void:
 				GetGlobalManager().next_spawn_position = spawn_position
 			
 			# Cambiar a la escena destino
-			get_tree().change_scene_to_file(target_scene)
+			WorldState.change_scene(target_scene)
 		else:
 			print("Advertencia: No has configurado la escena de destino (target_scene) en este portal.")
 

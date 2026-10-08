@@ -20,6 +20,7 @@ func change_scene() -> void:
 		if spawn_position != Vector2.ZERO:
 			if get_node_or_null("/root/Global"):
 				get_node("/root/Global").next_spawn_position = spawn_position
-		get_tree().change_scene_to_file(new_scene_path)
+		# Guarda el estado del mundo actual antes de salir
+		WorldState.change_scene(new_scene_path)
 	else:
 		print("Advertencia: new_scene_path no tiene asignada una escena .tscn")
