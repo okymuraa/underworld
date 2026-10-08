@@ -1,0 +1,45 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/components/crop_plot.gd" id="1_plot"]
+[ext_resource type="Script" path="res://scripts/components/interactable.gd" id="2_interact"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_col"]
+radius = 12.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_interact"]
+radius = 24.0
+
+[node name="PlanterBox" type="StaticBody2D"]
+y_sort_enabled = true
+
+[node name="BoxVisual" type="Node2D" parent="."]
+position = Vector2(0, 0)
+
+[node name="BoxShadow" type="Polygon2D" parent="BoxVisual"]
+color = Color(0, 0, 0, 0.3)
+polygon = PackedVector2Array(0, 18, 30, 2, 0, -14, -30, 2)
+
+[node name="BoxWood" type="Polygon2D" parent="BoxVisual"]
+color = Color(0.42, 0.28, 0.16, 1)
+polygon = PackedVector2Array(0, 14, 28, 0, 0, -14, -28, 0)
+
+[node name="BoxSoil" type="Polygon2D" parent="BoxVisual"]
+color = Color(0.22, 0.16, 0.11, 1)
+polygon = PackedVector2Array(0, 10, 22, -1, 0, -11, -22, -1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_col")
+
+[node name="CropPlot" type="Node2D" parent="."]
+script = ExtResource("1_plot")
+is_planter_box = true
+
+[node name="PlantSprite" type="Sprite2D" parent="CropPlot"]
+position = Vector2(0, -6)
+
+[node name="Interactable" type="Area2D" parent="CropPlot"]
+script = ExtResource("2_interact")
+prompt_message = "Plantar"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CropPlot/Interactable"]
+shape = SubResource("CircleShape2D_interact")

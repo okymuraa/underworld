@@ -31,10 +31,13 @@ func _give_starter_tools() -> void:
 	# Cargar herramientas iniciales para que el jugador pueda probar de inmediato
 	var axe = load("res://resources/items/axe.tres") as ItemData
 	var pickaxe = load("res://resources/items/pickaxe.tres") as ItemData
+	var seed_item = load("res://resources/items/lumina_seed.tres") as ItemData
 	if axe:
 		add_item(axe, 1)
 	if pickaxe:
 		add_item(pickaxe, 1)
+	if seed_item:
+		add_item(seed_item, 3)
 	selected_slot = 0
 
 func _unhandled_input(event: InputEvent) -> void:

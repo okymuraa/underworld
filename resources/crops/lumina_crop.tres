@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CropData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/crop_data.gd" id="1_crop"]
+[ext_resource type="Resource" path="res://resources/items/lumina_flower.tres" id="2_flower"]
+[ext_resource type="Resource" path="res://resources/items/lumina_seed.tres" id="3_seed"]
+
+[resource]
+script = ExtResource("1_crop")
+id = "lumina"
+crop_name = "Flor Lumina"
+seconds_per_stage = 8.0
+growth_stage_textures = []
+placeholder_color = Color(0.2, 0.95, 0.85, 1)
+harvest_item = ExtResource("2_flower")
+min_harvest_count = 1
+max_harvest_count = 2
+seed_item = ExtResource("3_seed")
+extra_seed_chance = 0.5
+is_perennial_wild = false
+wild_regrow_time = 15.0
