@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://7302yt0xlce4"]
+
+[ext_resource type="Script" path="res://scripts/player/player.gd" id="1_player_script"]
+[ext_resource type="SpriteFrames" path="res://resources/sprite_frames/player.tres" id="2_onrkg"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hotbar.tscn" id="3_hotbar"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_feet"]
+radius = 8.0
+
+[node name="Player" type="CharacterBody2D" unique_id=813801861]
+y_sort_enabled = true
+script = ExtResource("1_player_script")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1806935394]
+texture_filter = 1
+position = Vector2(0, -16)
+sprite_frames = ExtResource("2_onrkg")
+animation = &"walk"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2089069649]
+position = Vector2(0, -2)
+shape = SubResource("CircleShape2D_feet")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1716612587]
+position = Vector2(0, -16)
+zoom = Vector2(2.0, 2.0)
+position_smoothing_enabled = true
+
+[node name="HotbarUI" parent="." instance=ExtResource("3_hotbar")]

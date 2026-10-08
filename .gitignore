@@ -1,0 +1,10 @@
+# Godot 4 .gitignore
+.godot/
+*.translation
+
+# OS / Editor temporary files
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+*~

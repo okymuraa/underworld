@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = "axe"
+name = "Hacha"
+description = "Herramienta básica para cortar árboles y ramas."
+placeholder_color = Color(0.85, 0.45, 0.2, 1)
+placeholder_symbol = "H"
+max_stack = 1
+item_type = "tool"
+tool_type = "axe"
+tool_power = 1

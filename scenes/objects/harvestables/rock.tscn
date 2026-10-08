@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/components/harvestable.gd" id="1_harv"]
+[ext_resource type="Resource" path="res://resources/items/stone.tres" id="2_stone"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_rock"]
+radius = 14.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_harv"]
+radius = 22.0
+
+[node name="Rock" type="StaticBody2D"]
+y_sort_enabled = true
+
+[node name="dibujo" type="Node2D" parent="."]
+position = Vector2(0, -4)
+
+[node name="Shadow" type="Polygon2D" parent="dibujo"]
+color = Color(0, 0, 0, 0.3)
+polygon = PackedVector2Array(-14, 4, -8, 8, 8, 8, 14, 4, 10, 0, -10, 0)
+
+[node name="RockBody" type="Polygon2D" parent="dibujo"]
+color = Color(0.48, 0.5, 0.55, 1)
+polygon = PackedVector2Array(-12, 2, -14, -6, -8, -14, 0, -16, 10, -12, 14, -4, 12, 2, 2, 5, -8, 5)
+
+[node name="RockFacet" type="Polygon2D" parent="dibujo"]
+color = Color(0.6, 0.63, 0.68, 1)
+polygon = PackedVector2Array(-8, -14, 0, -16, 10, -12, 2, -6, -4, -6)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -2)
+shape = SubResource("CircleShape2D_rock")
+
+[node name="Harvestable" type="Area2D" parent="." node_paths=PackedStringArray("visual_node")]
+script = ExtResource("1_harv")
+resource_name = "Roca"
+max_health = 4
+required_tool = "pickaxe"
+drop_item = ExtResource("2_stone")
+min_drop_count = 2
+max_drop_count = 5
+respawn_time = 25.0
+visual_node = NodePath("../dibujo")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Harvestable"]
+position = Vector2(0, -6)
+shape = SubResource("CircleShape2D_harv")

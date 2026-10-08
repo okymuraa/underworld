@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://gwduiqdu0g48"]
+
+[ext_resource type="Texture2D" uid="uid://bnntnrl47a8qc" path="res://art/interiors/interior_bueno.png" id="1_wm0j4"]
+[ext_resource type="PackedScene" uid="uid://7302yt0xlce4" path="res://scenes/player/player.tscn" id="2_player"]
+[ext_resource type="Script" uid="uid://6gxmg7n28fh4" path="res://scripts/world/door.gd" id="3_7ysyj"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_yefsc"]
+size = Vector2(16, 16)
+
+[node name="casa_interior" type="Node2D" unique_id=1227710838]
+y_sort_enabled = true
+
+[node name="base" type="Node2D" parent="." unique_id=443208296]
+
+[node name="Sprite2D" type="Sprite2D" parent="base" unique_id=278836363]
+z_index = -10
+texture_filter = 1
+texture = ExtResource("1_wm0j4")
+
+[node name="Player" parent="." unique_id=802717613 instance=ExtResource("2_player")]
+position = Vector2(-49.13011, 84.29591)
+
+[node name="paredes" type="StaticBody2D" parent="." unique_id=2142022735]
+position = Vector2(-1, 0)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="paredes" unique_id=1607474753]
+position = Vector2(-1, 0)
+build_mode = 1
+polygon = PackedVector2Array(2, -8, 131, 59, 2, 126, -127, 59)
+
+[node name="Area2D" type="Area2D" parent="paredes/CollisionPolygon2D" unique_id=776684852]
+position = Vector2(-50.833767, 87.97385)
+script = ExtResource("3_7ysyj")
+new_scene_path = "res://scenes/levels/main.tscn"
+spawn_position = Vector2(33, 195)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="paredes/CollisionPolygon2D/Area2D" unique_id=163847863]
+position = Vector2(-12.166233, 6.0261536)
+shape = SubResource("RectangleShape2D_yefsc")
+
+[connection signal="body_entered" from="paredes/CollisionPolygon2D/Area2D" to="paredes/CollisionPolygon2D/Area2D" method="_on_body_entered"]
